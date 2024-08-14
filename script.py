@@ -2,6 +2,13 @@
 
 #!/usr/bin/env python3
 
+######
+# MAKE SURE TO START THE REDIS SERVER BEFORE RUNNING ANYTHING ELSE
+# redis-server in command line
+
+# ALSO MAKE SURE TO STOP SERVER WHEN EXECUTION OF THIS SCRIPT IS STOPPED
+######
+
 # Library for rich markdown conversion
 from rich.console import Console
 from rich.markdown import Markdown
