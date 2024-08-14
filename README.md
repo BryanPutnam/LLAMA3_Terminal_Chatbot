@@ -1,0 +1,1 @@
+To run this, simply type 'Spit' (alias) in the terminal window. If no alias exists, you can use 'python script.py'.
