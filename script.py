@@ -1,5 +1,6 @@
 # Tells OS to run as python executible 
 #!/usr/bin/env python3
+import os
 
 # Import Redis Database info from config.json
 import json
@@ -31,10 +32,16 @@ prompt_counter = 0
 # Global redis client 
 redis_client = None
 
+def get_api_key(): 
+    API_KEY = os.getenv('GROQ_API_KEY')
+    return API_KEY
+
 def get_redis_client():
     global redis_client
     if redis_client is None:
-        config = json.load(open('config.json'))
+        config_path = os.getenv('CONFIG_PATH', 'config.json')
+        with open(config_path, 'r') as file: 
+            config = json.load(file)
         redis_endpoint = config['redis']['endpoint']
         redis_password = config['redis']['password']
         
@@ -115,7 +122,8 @@ def prompt(prompt_counter):
 
 
 def conversation(prompt_counter): 
-    client = Groq()
+    API_KEY = get_api_key()
+    client = Groq(api_key=API_KEY)
 
     # Append the user's input to the converstation history
     conversation_history.append({ 
@@ -139,7 +147,6 @@ def conversation(prompt_counter):
     for chunk in completion:
         response_chunk = chunk.choices[0].delta.content or ""
         response += response_chunk
-    # Handle markdown response
     markdown = Markdown(response)
     console.print(markdown, end="")
     
