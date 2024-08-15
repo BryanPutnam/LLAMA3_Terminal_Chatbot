@@ -44,6 +44,8 @@ def get_redis_client():
         except Exception as err:
             print(f"Error connecting to Redis: {err}")
             sys.exit(1)
+    # Load conversation history after successful connection to database
+    load_conversation_history()
     return redis_client
 
 def flatten_list(nested_list):
@@ -63,8 +65,10 @@ def load_conversation_history():
             data = redis_client.lrange("conversation_history_list", 0, -1)
             # Load data into conversation history (load in place)
             flat_data = flatten_list([json.loads(item.decode('utf-8')) for item in data if item])
-            conversation_history[:] = flat_data
-            print("Loading Conversation History...")
+            if(flat_data != []):
+                conversation_history[:] = flat_data
+                print("Loading Conversation History...")
+            else: print("No Available History...")
     except Exception as e:
         print(f"Failed to load conversation history: {e}")
         
@@ -144,13 +148,10 @@ def conversation(prompt_counter):
         "content": response
         })
     
-    #prompt_counter = 2
-    
 if __name__ == "__main__":
     try: 
         while True:
             get_redis_client()
-            load_conversation_history()
             conversation(prompt_counter)
             prompt_counter += 1
     except KeyboardInterrupt: 
