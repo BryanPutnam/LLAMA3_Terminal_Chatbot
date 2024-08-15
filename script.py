@@ -156,9 +156,9 @@ def conversation(prompt_counter):
         })
     
 if __name__ == "__main__":
+    #get_redis_client() # Comment this out if you do not with to use Redis AT ALL (No connection, loaded history, or pushed data)
     try: 
         while True:
-            get_redis_client()
             conversation(prompt_counter)
             prompt_counter += 1
     except KeyboardInterrupt: 
