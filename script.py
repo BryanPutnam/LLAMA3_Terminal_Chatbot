@@ -18,10 +18,14 @@ from rich.markdown import Markdown
 
 # Library for Groq
 from groq import Groq
+
+# Initialize console for markdown
 console = Console()
 
 # Initialize conversation history list 
 conversation_history = []
+
+# Initialize counter for prompt message
 prompt_counter = 0
 
 # Global redis client 
@@ -42,15 +46,37 @@ def get_redis_client():
             sys.exit(1)
     return redis_client
 
-# def load_conversation_history(): 
-#     # code here  
+def flatten_list(nested_list):
+    flat_list = []
+    for item in nested_list:
+        if isinstance(item, list):
+            flat_list.extend(flatten_list(item))
+        else:
+            flat_list.append(item)
+    return flat_list
+
+def load_conversation_history(): 
+    global redis_client
+    try: 
+        if redis_client: 
+            # Retrieve all elements from the Redis list 
+            data = redis_client.lrange("conversation_history_list", 0, -1)
+            # Load data into conversation history (load in place)
+            flat_data = flatten_list([json.loads(item.decode('utf-8')) for item in data if item])
+            conversation_history[:] = flat_data
+            print("Loading Conversation History...")
+    except Exception as e:
+        print(f"Failed to load conversation history: {e}")
         
 def push_conversation_history():
     try:
         if redis_client:
-            # Push as list
-            redis_client.rpush("conversation_history_list", json.dumps(conversation_history))
-            print("Pushing to Redis...")
+            if conversation_history:
+                # Push as list
+                redis_client.rpush("conversation_history_list", json.dumps(conversation_history))
+                print("Pushing to Redis...")
+            else: 
+                print("Conversation Empty. Skipping Push...")
     except Exception as e:
         print(f"Failed to push to Redis: {e}", redis_client)
 
@@ -66,7 +92,6 @@ def handle_exit(signal, frame):
         finally:
             redis_client = None  # Ensure it's not referenced again
             print("Finished")
-    # BELOW IS NEW LINE 
     print("=" * getTermWidth())
     sys.exit(0)
 
@@ -119,14 +144,14 @@ def conversation(prompt_counter):
         "content": response
         })
     
-    prompt_counter = 2
+    #prompt_counter = 2
     
 if __name__ == "__main__":
     try: 
         while True:
             get_redis_client()
-            #load_conversation_history()
-            conversation(prompt_counter) # Will possibly need to add conversation_history as a param here once load_conversation_history() is set up. 
+            load_conversation_history()
+            conversation(prompt_counter)
             prompt_counter += 1
     except KeyboardInterrupt: 
         print("\nGoodbye!")
