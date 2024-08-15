@@ -48,7 +48,8 @@ def get_redis_client():
 def push_conversation_history():
     try:
         if redis_client:
-            redis_client.hset("conversation_history", "history", json.dumps(conversation_history))
+            # Push as list
+            redis_client.rpush("conversation_history_list", json.dumps(conversation_history))
             print("Pushing to Redis...")
     except Exception as e:
         print(f"Failed to push to Redis: {e}", redis_client)
