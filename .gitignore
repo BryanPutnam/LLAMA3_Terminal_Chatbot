@@ -1,3 +1,5 @@
 # Ignore configuration file
 config.json
 
+# Ingore pycache 
+__pycache__/
