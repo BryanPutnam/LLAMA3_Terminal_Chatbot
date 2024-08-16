@@ -5,6 +5,12 @@ import os
 import sys
 import redis 
 
+# Library for rich markdown conversion
+from rich.console import Console
+from rich.markdown import Markdown
+
+console = Console()
+
 # Global redis client 
 redis_client = None
 
@@ -21,7 +27,7 @@ def get_redis_client(conversation_history):
             redis_client = redis.Redis(host=redis_endpoint, port=18656, password=redis_password)
             print("Connecting to Redis...")
         except Exception as err:
-            print(f"Error connecting to Redis: {err}")
+            console.print(f"[bold red]WARNING:[/bold red] Error connecting to Redis: {err}")
             sys.exit(1)
     # Load conversation history after successful connection to database
     load_conversation_history(conversation_history)
@@ -49,7 +55,7 @@ def load_conversation_history(conversation_history): ## ADDED PARAM
                 print("Loading Conversation History...")
             else: print("No Available History...")
     except Exception as e:
-        print(f"Failed to load conversation history: {e}")
+        console.print(f"[bold red]WARNING:[/bold red] Failed to load Redis data: No previously stored data will be available moving forward. \n {e}")
         
 def push_conversation_history(conversation_history): ## ADDED PARAM
     try:
@@ -61,9 +67,9 @@ def push_conversation_history(conversation_history): ## ADDED PARAM
             else: 
                 print("Conversation Empty. Skipping Push...")
     except Exception as e:
-        print(f"Failed to push to Redis: {e}", redis_client)
+        console.print(f"[bold red]WARNING:[/bold red] Failed to push to Redis: {e}", redis_client)
 
-def handle_exit(signal, frame, term_width, conversation_history):
+def handle_exit(signal, frame, conversation_history, term_width):
     global redis_client
     if redis_client:
         print("Closing Redis Connection...")
@@ -71,7 +77,7 @@ def handle_exit(signal, frame, term_width, conversation_history):
             push_conversation_history(conversation_history)
             redis_client.close()
         except Exception as e:
-            print(f"Error during Redis client cleanup: {e}")
+            console.print(f"[bold red]WARNING:[/bold red] Error during Redis client cleanup: {e}")
         finally:
             redis_client = None  # Ensure it's not referenced again
             print("Finished")

@@ -51,37 +51,45 @@ def prompt(prompt_counter):
 
 def conversation(prompt_counter): 
     API_KEY = get_api_key()
-    client = Groq(api_key=API_KEY)
+    
+    try:
+        client = Groq(api_key=API_KEY)
+    except Exception as e: 
+        console.print(f"[bold red]WARNING:[/bold red] Failed to connect to Groq. Please check your API KEY and/or Network Connnection") 
 
     # Append the user's input to the converstation history
     conversation_history.append({ 
         "role": "user", 
         "content": prompt(prompt_counter)
         })
-
-    completion = client.chat.completions.create(
-        model="llama-3.1-70b-versatile",
-        messages=conversation_history,
-        temperature=1,
-        max_tokens=1024,
-        top_p=1,
-        stream=True,
-        stop=None,
-    )
     
-    print("\n")
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-70b-versatile",
+            messages=conversation_history,
+            temperature=1,
+            max_tokens=1024,
+            top_p=1,
+            stream=True,
+            stop=None,
+        )
     
-    response = ""
-    for chunk in completion:
-        response_chunk = chunk.choices[0].delta.content or ""
-        response += response_chunk
-    markdown = Markdown(response)
-    console.print(markdown, end="")
+        print("\n")
+        
+        response = ""
+        for chunk in completion:
+            response_chunk = chunk.choices[0].delta.content or ""
+            response += response_chunk
+        markdown = Markdown(response)
+        console.print(markdown, end="")
     
-    conversation_history.append({ 
-        "role": "user", 
-        "content": response
-        })
+        conversation_history.append({ 
+            "role": "user", 
+            "content": response
+            })
+    except Exception as e: 
+        console.print(f"[bold red]WARNING:[/bold red] Unable to Complete Request: Check Groq Server Status")
+        sys.exit(0)
     
 if __name__ == "__main__":
     get_redis_client(conversation_history) # Comment this out if you do not with to use Redis AT ALL (No connection, loaded history, or pushed data)
@@ -92,6 +100,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt: 
         print("\nGoodbye!")
         print("=" * getTermWidth())
-        term_width = getTermWidth()
-        handle_exit(signal.SIGINT, None, term_width, conversation_history)
+        handle_exit(signal.SIGINT, None, conversation_history, term_width=getTermWidth())
     
