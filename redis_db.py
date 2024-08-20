@@ -11,6 +11,10 @@ import secrets
 from rich.console import Console
 from rich.markdown import Markdown
 
+# Load .env file
+from dotenv import load_dotenv 
+load_dotenv()
+
 class RedisOperations:
     
     def __init__(self): 
@@ -89,8 +93,7 @@ class RedisOperations:
     def load_conversation_history(self, conversation_history):
         try: 
             if self.redis_client: 
-                data = [] # Initialize 
-                # Retrieve last 3 elements from the Redis list 
+                data = []
                 if((self.redis_client.execute_command('DBSIZE') - 1) >= 5):
                     try:
                         last_three_keys = self.get_last_session_keys(5)
@@ -118,7 +121,7 @@ class RedisOperations:
             if self.redis_client:
                 if qa_segment:
                     self.redis_client.rpush(self.session_key, json.dumps(qa_segment)) # Push as list
-                    print("Pushing to Redis...")
+                    print("\nPushing to Redis...")
                 else: 
                     print("Conversation Empty. Skipping Push...")
         except Exception as e:

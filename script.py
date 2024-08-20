@@ -10,6 +10,10 @@ import shutil
 from rich.console import Console
 from rich.markdown import Markdown
 
+# Load .env file
+from dotenv import load_dotenv 
+load_dotenv()
+
 # Library for Groq
 from groq import Groq
 
