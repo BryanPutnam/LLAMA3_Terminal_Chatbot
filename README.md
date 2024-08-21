@@ -24,7 +24,7 @@ This project provides a terminal-based application that allows users to interact
 ```cd <project-directory>```
 
 3) Install Dependencies:
-```pip install <dependencies>```
+```pip install -r requirements.txt```
 
 4) Create a .env File:
 ```touch .env```
