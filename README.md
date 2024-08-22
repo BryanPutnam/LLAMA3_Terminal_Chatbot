@@ -57,6 +57,7 @@ Create a config.json in the project root directory and add your Redis Database i
 ### **Troubleshooting**
 - Redis Connection Issues: Ensure Redis is running and accessible. Check the Redis URL in your .env file.
 - API Key Errors: Verify your Groq API key is correctly configured in the .env file.
+- Response Issues: Any response issues experienced with the LLAMA model are generally the result of upstream or service-level disruptions with Groq or LLAMA itself, rather than issues with the provided code. If you're experiencing problems and no errors are thrown, this is the most likely cause. 
 
 ### **License**
 - This project is licensed under the MIT License 
