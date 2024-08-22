@@ -3,10 +3,13 @@
 import os
 import sys
 
+# Import ASCII Library
+import pyfiglet
+
 # Library for terminal width to calculate separation barrier
 import shutil
 
-# Library for rich markdown conversion
+# Library for rich markdown and progress bars
 from rich.console import Console
 from rich.markdown import Markdown
 
@@ -33,6 +36,10 @@ conversation_history = []
 
 # Initialize counter for prompt message
 prompt_counter = 0
+
+def intro(): 
+    f = pyfiglet.figlet_format("Llama", font="smisome1")
+    print(f)
 
 def get_api_key(): 
     API_KEY = os.getenv('GROQ_API_KEY')
@@ -101,6 +108,7 @@ def conversation(prompt_counter):
         sys.exit(0)
     
 if __name__ == "__main__":
+    intro()
     rdb.get_redis_client(conversation_history) # Comment this out if you do not wish to use Redis AT ALL (No connection, loaded history, or pushed data)
     try: 
         while True:
