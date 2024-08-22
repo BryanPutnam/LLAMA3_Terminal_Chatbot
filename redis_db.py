@@ -9,7 +9,6 @@ import secrets
 
 # Library for rich markdown conversion
 from rich.console import Console
-from rich.markdown import Markdown
 
 # Load .env file
 from dotenv import load_dotenv 
@@ -94,9 +93,9 @@ class RedisOperations:
         try: 
             if self.redis_client: 
                 data = []
-                if((self.redis_client.execute_command('DBSIZE') - 1) >= 5):
+                if((self.redis_client.execute_command('DBSIZE') - 1) >= 3):
                     try:
-                        last_three_keys = self.get_last_session_keys(5)
+                        last_three_keys = self.get_last_session_keys(3)
                         last_three_vals = self.get_last_session_values(last_three_keys)
                         data = last_three_vals
                     except Exception as e: 

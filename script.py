@@ -2,6 +2,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import socket
 
 # Import ASCII Library
 import pyfiglet
@@ -40,6 +41,14 @@ prompt_counter = 0
 def intro(): 
     f = pyfiglet.figlet_format("Llama", font="smisome1")
     print(f)
+    
+def check_internet_connection(host="8.8.8.8", port=53, timeout=3): 
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True, None
+    except socket.error as ex:
+        return False, ex
 
 def get_api_key(): 
     API_KEY = os.getenv('GROQ_API_KEY')
@@ -105,10 +114,19 @@ def conversation(prompt_counter):
         
     except Exception as e: 
         console.print(f"[bold red]WARNING:[/bold red] Unable to Complete Request: Check Groq Server Status: {e}")
+        if(rdb.redis_client): 
+            rdb.redis_client.close()
+            del rdb.redis_client
+        print("=" * getTermWidth())
         sys.exit(0)
     
 if __name__ == "__main__":
     intro()
+    connected, exception = check_internet_connection()
+    if not connected: 
+        console.print(f"[bold red]WARNING:[/bold red] Internet Connection Required: {exception}")
+        print("Exiting...")
+        sys.exit(0)
     rdb.get_redis_client(conversation_history) # Comment this out if you do not wish to use Redis AT ALL (No connection, loaded history, or pushed data)
     try: 
         while True:
