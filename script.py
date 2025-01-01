@@ -88,7 +88,7 @@ def conversation(prompt_counter):
     
     try:
         completion = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",
             messages=conversation_history,
             temperature=1,
             max_tokens=1024,
